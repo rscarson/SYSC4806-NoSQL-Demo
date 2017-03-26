@@ -1,0 +1,39 @@
+CREATE (Executive:Role {title:'Executive'})
+CREATE (SalesExec:Role {title:'Sales Executive'})
+CREATE (SalesRep:Role {title:'Sales Rep'})
+CREATE (Administration:Role {title:'Administration'})
+CREATE (Purchasing:Role {title:'Purchasing'})
+CREATE (Accounting:Role {title:'Accounting'})
+CREATE (Auditor:Role {title:'Auditor'})
+
+CREATE (SalesReports:Permission {title:'Get Sales Reports'})
+CREATE (AccountingReports:Permission {title:'Get Accounting Reports'})
+CREATE (PurchaseStock:Permission {title:'Purchase Stock'})
+CREATE (SendQuotes:Permission {title:'Send Quotes'})
+CREATE (SendInvoices:Permission {title:'Send Invoices'})
+CREATE (ViewPay:Permission {title:'View Pay'})
+
+CREATE
+	(Auditor)-[:CAN]->(ViewPay),
+	(Auditor)-[:CAN]->(AccountingReports),
+	(Auditor)-[:CAN]->(SalesReports),
+	(Accounting)-[:CAN]->(SendInvoices),
+	(Accounting)-[:CAN]->(ViewPay),
+	(Accounting)-[:CAN]->(AccountingReports),
+	(Purchasing)-[:CAN]->(PurchaseStock),
+	(Administration)-[:CAN]->(SendInvoices),
+	(Administration)-[:CAN]->(AccountingReports),
+	(SalesRep)-[:CAN]->(SendQuotes),
+	(SalesExec)-[:CAN]->(SalesReports)
+
+CREATE
+	(SalesExec)-[:IS_A]->(SalesRep),
+	(Administration)-[:IS_A]->(Purchasing),
+	(Accounting)-[:IS_A]->(Purchasing),
+	(Executive)-[:IS_A]->(Administration),
+	(Executive)-[:IS_A]->(Accounting),
+	(Executive)-[:IS_A]->(SalesExec)
+
+WITH Executive as a
+MATCH (a)-[:IS_A*0..99]->(b)-[:CAN]->(c)
+RETURN c.title as Permission;
